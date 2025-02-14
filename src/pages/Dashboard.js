@@ -98,7 +98,6 @@ const Dashboard = () => {
       ) : (
         <Row gutter={[16, 16]} justify="center">
           {entities.map((entity) => {
-            // ถ้าเป็น door sensor ให้แสดงแค่สถานะ
             if (entity.entity_id === "binary_sensor.door_sensor_door") {
               return (
                 <Col key={entity.entity_id} xs={24} sm={12} md={8} lg={6}>
