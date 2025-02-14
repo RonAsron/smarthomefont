@@ -17,13 +17,11 @@ import {
   HomeOutlined,
 } from "@ant-design/icons";
 import { getUserProfile } from "../api/apibackend";
-
 const { Title, Text } = Typography;
 
 const Users = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchUser = async () => {
       try {

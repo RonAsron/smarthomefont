@@ -18,7 +18,6 @@ const Settings = () => {
         setLoading(false);
       }
     };
-    
 
     getLogbookData();
   }, []);

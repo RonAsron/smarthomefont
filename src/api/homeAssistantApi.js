@@ -109,4 +109,3 @@ export const changeDeviceState = async (entityId, state) => {
     throw error;
   }
 };
-

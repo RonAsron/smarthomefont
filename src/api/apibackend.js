@@ -2,12 +2,8 @@ import axios from 'axios';
 
 const API_URL = "https://homeassistant.picsmart.space/api";
 
-// Call the function to log the URL
-logApiUrl();
-
 export const registerUser = async (userData) => {
   try {
-
     const response = await axios.post(`${API_URL}/register/`, userData);
     return response.data;
   } catch (error) {
@@ -19,6 +15,7 @@ export const registerUser = async (userData) => {
 export const loginUser = async (credentials) => {
   try {
     const response = await axios.post(`https://homeassistant.picsmart.space/api/login/`, credentials);
+
     console.log("Login response:", response.data);
 
     const { access, refresh } = response.data;
@@ -34,10 +31,6 @@ export const loginUser = async (credentials) => {
     throw new Error("Login failed. Please check your credentials.");
   }
 };
-
-const accessToken = localStorage.getItem("accessToken");
-console.log(accessToken);  
-
 
 export const logoutUser = () => {
   localStorage.removeItem("accessToken");
