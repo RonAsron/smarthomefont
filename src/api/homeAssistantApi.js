@@ -23,7 +23,6 @@ const ALLOWED_DEVICES = [
   "Switch 3 Gang Switch 3",
 ];
 
-// ดึงเฉพาะอุปกรณ์ที่ต้องการ
 export const fetchEntities = async () => {
   try {
     const response = await apiClient.get("/states");
@@ -36,7 +35,6 @@ export const fetchEntities = async () => {
   }
 };
 
-// เปิด/ปิดอุปกรณ์
 export const toggleDevice = async (entityId, isOn) => {
   try {
     const newState = isOn ? "turn_off" : "turn_on";
@@ -49,46 +47,36 @@ export const toggleDevice = async (entityId, isOn) => {
     throw error;
   }
 };
-
-// เปลี่ยนสีของหลอดไฟ
 export const setLightColor = async (entityId, color = null, colorTemp = null) => {
   try {
     const data = {};
-
-    // ตรวจสอบโหมดสี
-    const entity = await fetchDeviceStatus(entityId); // ดึงข้อมูลสถานะของ entity
+    const entity = await fetchDeviceStatus(entityId);
     const colorMode = entity.attributes.color_mode;
 
     if (colorMode === 'hs' && color) {
-      // ใช้ hs_color หากโหมดสีเป็น hs
-      data["hs_color"] = color; // ส่งค่า hs_color (hue, saturation)
+      data["hs_color"] = color;
     } else if (colorTemp) {
-      // ใช้ color_temp หากโหมดสีเป็น color_temp
       data["color_temp"] = colorTemp;
     } else if (color) {
-      // ถ้าเป็น rgb_color ให้ส่ง rgb_color
       data["rgb_color"] = color;
     }
 
-    console.log("Sending data:", data); // log ข้อมูลที่ส่งไป
+    console.log("Sending data:", data);
 
     const response = await apiClient.post(`/services/light/turn_on`, {
       entity_id: entityId,
       ...data,
     });
 
-    console.log("API response:", response.data); // log ข้อมูลตอบกลับจาก API
+    console.log("API response:", response.data);
   } catch (error) {
     console.error("Error setting light color:", error);
     throw error;
   }
 };
-// ฟังก์ชันดึงข้อมูลจาก Logbook
 export const fetchLogbook = async () => {
   try {
     const response = await apiClient.get("/logbook");
-    
-    // Log the response data to the console
     console.log("Logbook data fetched:", response.data);
     
     return response.data;
@@ -99,7 +87,6 @@ export const fetchLogbook = async () => {
 };
 
 
-// ฟังก์ชันสำหรับการดึงข้อมูลเกี่ยวกับสถานะของอุปกรณ์
 export const fetchDeviceStatus = async (entityId) => {
   try {
     const response = await apiClient.get(`/states/${entityId}`);
@@ -110,7 +97,6 @@ export const fetchDeviceStatus = async (entityId) => {
   }
 };
 
-// ฟังก์ชันเปลี่ยนสถานะของอุปกรณ์ (เปิด/ปิด)
 export const changeDeviceState = async (entityId, state) => {
   try {
     await apiClient.post(`/services/homeassistant/turn_${state}`, {
