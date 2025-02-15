@@ -67,7 +67,7 @@ const Dashboard = () => {
       console.log("Setting color to:", color.hex); // log สีที่ส่งไป
 
       // แปลงสีจาก hex เป็น hs (hue, saturation)
-      const hsColor = hexToHs(color.hex);
+      const hsColor = hexToHs(color.hex); 
       console.log("Converted HS color:", hsColor); // log ค่า HS ที่แปลงแล้ว
 
       // ตั้งค่า selectedColor
@@ -197,8 +197,6 @@ const Dashboard = () => {
                         color: "#424242",
                       }}
                     >
-                      สถานะ:{" "}
-                      <strong>{entity.state === "on" ? "เปิด" : "ปิด"}</strong>
                     </p>
                   </Card>
                 </Col>
@@ -247,8 +245,6 @@ const Dashboard = () => {
                       color: "#424242",
                     }}
                   >
-                    สถานะ:{" "}
-                    <strong>{entity.state === "on" ? "เปิด" : "ปิด"}</strong>
                   </p>
 
                   <Button
@@ -287,7 +283,6 @@ const Dashboard = () => {
                         footer={null}
                         centered
                         width={300}
-                        style={{ maxWidth: "90%" }}
                       >
                         <div
                           style={{
@@ -298,6 +293,7 @@ const Dashboard = () => {
                         >
                           <Wheel
                             color={selectedColor[entity.entity_id] || "#ffffff"}
+
                             onChange={(color) => {
                               console.log("Color changed to:", color.hex); // log เพื่อให้แน่ใจว่า color.hex มีค่า
                               handleColorChange(entity, color);
