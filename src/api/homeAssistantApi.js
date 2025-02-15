@@ -23,6 +23,7 @@ const ALLOWED_DEVICES = [
   "Switch 3 Gang Switch 3",
 ];
 
+// ดึงเฉพาะอุปกรณ์ที่ต้องการ
 export const fetchEntities = async () => {
   try {
     const response = await apiClient.get("/states");
