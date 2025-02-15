@@ -68,7 +68,7 @@ const HeaderBar = ({ collapsed, setCollapsed }) => {
         style={menuButtonStyle} 
         onClick={() => navigate("/settings")}
       >
-        ตั้งค่า
+        Logbook 
       </Button>
       <Button 
         type="text" 

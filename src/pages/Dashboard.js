@@ -63,11 +63,79 @@ const Dashboard = () => {
 
   const handleColorChange = async (entity, color) => {
     try {
-      setSelectedColor((prev) => ({ ...prev, [entity.entity_id]: color }));
-      await setLightColor(entity.entity_id, color);
+      // ตรวจสอบว่า color.hex มีค่า
+      if (!color || !color.hex) {
+        throw new Error("Color hex is undefined.");
+      }
+
+      console.log("Setting color to:", color.hex); // log สีที่ส่งไป
+
+      // แปลงสีจาก hex เป็น hs (hue, saturation)
+      const hsColor = hexToHs(color.hex); 
+      console.log("Converted HS color:", hsColor); // log ค่า HS ที่แปลงแล้ว
+
+      // ตั้งค่า selectedColor
+      setSelectedColor((prev) => ({ ...prev, [entity.entity_id]: color.hex }));
+
+      // ส่งค่า hs_color ไปยัง setLightColor
+      await setLightColor(entity.entity_id, hsColor);
     } catch (error) {
       console.error("Failed to change light color:", entity.entity_id);
+      console.error("Error details:", error.message); // log ข้อความ error
     }
+  };
+
+  // ฟังก์ชันแปลง Hex เป็น HS
+  const hexToHs = (hex) => {
+    const rgb = hexToRgb(hex);
+    const r = rgb[0] / 255;
+    const g = rgb[1] / 255;
+    const b = rgb[2] / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    let s = 0;
+    let v = max;
+
+    const delta = max - min;
+    if (max !== 0) {
+      s = delta / max;
+    }
+    if (max === min) {
+      h = 0;
+    } else {
+      switch (max) {
+        case r:
+          h = (g - b) / delta;
+          if (g < b) h += 6;
+          break;
+        case g:
+          h = (b - r) / delta + 2;
+          break;
+        case b:
+          h = (r - g) / delta + 4;
+          break;
+      }
+      h /= 6;
+    }
+
+    h = Math.round(h * 360);
+    s = Math.round(s * 100);
+
+    return [h, s];
+  };
+
+  const hexToRgb = (hex) => {
+    const result = /^#([a-fA-F0-9]{6})$/.exec(hex);
+    if (!result) {
+      return null;
+    }
+    return [
+      parseInt(result[1].substring(0, 2), 16),
+      parseInt(result[1].substring(2, 4), 16),
+      parseInt(result[1].substring(4, 6), 16),
+    ];
   };
 
   const handleColorTempChange = async (entity, temp) => {
@@ -98,7 +166,6 @@ const Dashboard = () => {
       ) : (
         <Row gutter={[16, 16]} justify="center">
           {entities.map((entity) => {
-            // ถ้าเป็น door sensor ให้แสดงแค่สถานะ
             if (entity.entity_id === "binary_sensor.door_sensor_door") {
               return (
                 <Col key={entity.entity_id} xs={24} sm={12} md={8} lg={6}>
@@ -134,7 +201,6 @@ const Dashboard = () => {
                         color: "#424242",
                       }}
                     >
-                      สถานะ: <strong>{entity.state === "on" ? "เปิด" : "ปิด"}</strong>
                     </p>
                   </Card>
                 </Col>
@@ -183,7 +249,6 @@ const Dashboard = () => {
                       color: "#424242",
                     }}
                   >
-                    สถานะ: <strong>{entity.state === "on" ? "เปิด" : "ปิด"}</strong>
                   </p>
 
                   <Button
@@ -232,9 +297,11 @@ const Dashboard = () => {
                         >
                           <Wheel
                             color={selectedColor[entity.entity_id] || "#ffffff"}
-                            onChange={(color) =>
-                              handleColorChange(entity, color.hex)
-                            }
+
+                            onChange={(color) => {
+                              console.log("Color changed to:", color.hex); // log เพื่อให้แน่ใจว่า color.hex มีค่า
+                              handleColorChange(entity, color);
+                            }}
                             size={180}
                           />
                         </div>

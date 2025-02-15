@@ -66,7 +66,6 @@ export const getUserProfile = async () => {
         throw new Error("Session expired. Please log in again.");
       }
     }
-    throw new Error(error.response?.data?.detail || "Failed to fetch user profile.");
   }
 };
 

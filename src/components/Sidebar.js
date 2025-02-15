@@ -80,7 +80,11 @@ const Sidebar = ({ collapsed }) => {
             icon: <SettingOutlined />,
             label: (
               <Link to="/settings" style={linkStyle}>
+<<<<<<< HEAD
                 Settings
+=======
+                Logbook
+>>>>>>> 43799d084af05c09f5c6d00576236466c108105c
               </Link>
             ),
             style: getMenuStyle(selectedKey, "/settings"),
