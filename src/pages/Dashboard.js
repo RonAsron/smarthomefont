@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Typography, Spin, Row, Col, Modal, Slider } from "antd";
+import { Card, Button, Typography, Spin, Row, Col, Modal, Slider , Badge  } from "antd";
 import {
   BulbOutlined,
   BgColorsOutlined,
   PoweroffOutlined,
 } from "@ant-design/icons";
 import { Wheel } from "@uiw/react-color";
-import { fetchEntities, toggleDevice, setLightColor, fetchLogbook } from '../api/homeAssistantApi';
+import {
+  fetchEntities,
+  toggleDevice,
+  setLightColor,
+  fetchLogbook,
+} from "../api/homeAssistantApi";
 
 const { Title } = Typography;
 
@@ -67,7 +72,7 @@ const Dashboard = () => {
       console.log("Setting color to:", color.hex); // log สีที่ส่งไป
 
       // แปลงสีจาก hex เป็น hs (hue, saturation)
-      const hsColor = hexToHs(color.hex); 
+      const hsColor = hexToHs(color.hex);
       console.log("Converted HS color:", hsColor); // log ค่า HS ที่แปลงแล้ว
 
       // ตั้งค่า selectedColor
@@ -162,48 +167,6 @@ const Dashboard = () => {
       ) : (
         <Row gutter={[16, 16]} justify="center">
           {entities.map((entity) => {
-            if (entity.entity_id === "binary_sensor.door_sensor_door") {
-              return (
-                <Col key={entity.entity_id} xs={24} sm={12} md={8} lg={6}>
-                  <Card
-                    hoverable
-                    style={{
-                      borderRadius: "12px",
-                      background: entity.state === "on" ? "#E1F5FE" : "#FAFAFA",
-                      textAlign: "center",
-                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                      minHeight: "250px",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      padding: "15px",
-                    }}
-                  >
-                    <Title level={4} style={{ color: "#1565C0" }}>
-                      {entity.attributes.friendly_name}
-                    </Title>
-
-                    <PoweroffOutlined
-                      style={{
-                        fontSize: "40px",
-                        color: entity.state === "on" ? "#FFD700" : "#BDBDBD",
-                      }}
-                    />
-
-                    <p
-                      style={{
-                        fontSize: "16px",
-                        marginTop: "10px",
-                        color: "#424242",
-                      }}
-                    >
-                    </p>
-                  </Card>
-                </Col>
-              );
-            }
-
-            // สำหรับอุปกรณ์ประเภทอื่นๆ
             const supportsColorTemp =
               entity.entity_id.startsWith("light.") &&
               entity.attributes.supported_color_modes?.includes("color_temp");
@@ -228,38 +191,54 @@ const Dashboard = () => {
                     {entity.attributes.friendly_name}
                   </Title>
 
-                  <BulbOutlined
-                    style={{
-                      fontSize: "40px",
-                      color:
-                        entity.state === "on"
-                          ? selectedColor[entity.entity_id] || "#FFD700"
-                          : "#BDBDBD",
-                    }}
-                  />
+                  {entity.entity_id === "binary_sensor.door_sensor_door" && (
+                    <>
+                      <div style={{ marginBottom: "15px" }}>
+                        <Badge
+                          status={entity.state === "on" ? "success" : "error"}
+                          text={
+                            entity.state === "on" ? "ประตูเปิด" : "ประตูปิด"
+                          }
+                          style={{
+                            fontSize: "16px",
+                            color:
+                              entity.state === "on" ? "#388E3C" : "#D32F2F",
+                          }}
+                        />
+                      </div>
 
-                  <p
-                    style={{
-                      fontSize: "16px",
-                      marginTop: "10px",
-                      color: "#424242",
-                    }}
-                  >
-                  </p>
-
-                  <Button
-                    type={entity.state === "on" ? "danger" : "primary"}
-                    shape="round"
-                    icon={<PoweroffOutlined />}
-                    size="large"
-                    style={{ marginTop: "10px", width: "100%" }}
-                    onClick={() => handleToggle(entity)}
-                  >
-                    {entity.state === "on" ? "ปิด" : "เปิด"}
-                  </Button>
+                      <PoweroffOutlined
+                        style={{
+                          fontSize: "40px",
+                          color: entity.state === "on" ? "#FFD700" : "#BDBDBD",
+                        }}
+                      />
+                    </>
+                  )}
 
                   {supportsColorTemp && (
                     <>
+                      <BulbOutlined
+                        style={{
+                          fontSize: "40px",
+                          color:
+                            entity.state === "on"
+                              ? selectedColor[entity.entity_id] || "#FFD700"
+                              : "#BDBDBD",
+                        }}
+                      />
+
+                      <Button
+                        type={entity.state === "on" ? "danger" : "primary"}
+                        shape="round"
+                        icon={<PoweroffOutlined />}
+                        size="large"
+                        style={{ marginTop: "10px", width: "100%" }}
+                        onClick={() => handleToggle(entity)}
+                      >
+                        {entity.state === "on" ? "ปิด" : "เปิด"}
+                      </Button>
+
                       <Button
                         shape="circle"
                         icon={<BgColorsOutlined />}
@@ -293,11 +272,9 @@ const Dashboard = () => {
                         >
                           <Wheel
                             color={selectedColor[entity.entity_id] || "#ffffff"}
-
-                            onChange={(color) => {
-                              console.log("Color changed to:", color.hex); // log เพื่อให้แน่ใจว่า color.hex มีค่า
-                              handleColorChange(entity, color);
-                            }}
+                            onChange={(color) =>
+                              handleColorChange(entity, color)
+                            }
                             size={180}
                           />
                         </div>
