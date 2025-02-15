@@ -2,18 +2,18 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:8123/api";
 const AUTH_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1MzNkY2IyYmFmZTg0ZjRiODc2ZDAyNDMwNjljNDliNiIsImlhdCI6MTczOTA5NjI1MCwiZXhwIjoyMDU0NDU2MjUwfQ.Zlhmf_xVo97UvWwbz8VsNeErgTb33NjswIXzSHCdoTA";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkMzY5Yjk1Y2QyZTY0ZGVlYjU5MmM4ZTVkZWJhNDc1OSIsImlhdCI6MTczOTYwOTU5MSwiZXhwIjoyMDU0OTY5NTkxfQ.M3c3bweIf34suaK3PTJz3qON7RJu6KxYIn4MYIVbw7U";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
+  headers: { 
     Authorization: `Bearer ${AUTH_TOKEN}`,
     "Content-Type": "application/json",
   },
 });
 
 const ALLOWED_DEVICES = [
-  "Reception Smart Light",
+  "Downligh",
   "หลอดไฟ Tuya 16 ล้านสี",
   "Door Sensor Door",
   "WiFi smart plug Socket 1",
@@ -21,15 +21,52 @@ const ALLOWED_DEVICES = [
   "Switch 3 Gang Switch 1",
   "Switch 3 Gang Switch 2",
   "Switch 3 Gang Switch 3",
+  "WiFi Breaker Switch 1"
 ];
 
 // ดึงเฉพาะอุปกรณ์ที่ต้องการ
 export const fetchEntities = async () => {
   try {
     const response = await apiClient.get("/states");
-    return response.data.filter(
-      (entity) => ALLOWED_DEVICES.includes(entity.attributes.friendly_name)
+    const data = response.data;
+
+    // กรองอุปกรณ์ที่ไม่ต้องการ
+    const filteredEntities = data.filter((entity) => {
+      // กรองโดยชื่อของ entity
+      const excludeNames = [
+        "asron", "Home Assistant", "บ้าน", "Sun", "Google Translate",
+        "Shopping List", "Door Sensor Tamper", 
+        "WiFi smart plug Power on behavior", "WiFi Breaker Power on behavior", 
+        "WiFi Breaker Indicator light mode", "Door Sensor Battery"
+      ];
+      
+      const excludeStates = ["off"];  // ซ่อนอุปกรณ์ที่สถานะเป็น "ปิด"
+
+      // ตรวจสอบชื่ออุปกรณ์ และสถานะ
+      const isExcludedName = excludeNames.some((name) => 
+        entity.attributes.friendly_name.includes(name)
+      );
+      const isExcludedState = excludeStates.includes(entity.state);
+
+      return !(isExcludedName || isExcludedState);
+    });
+
+    // รวมข้อมูลที่อยู่ใน ALLOWED_DEVICES ตลอดเวลา
+    const allowedEntities = data.filter((entity) =>
+      ALLOWED_DEVICES.some((allowedName) => 
+        entity.attributes.friendly_name.includes(allowedName)
+      )
     );
+
+    // รวมข้อมูลที่กรองแล้วและข้อมูลที่อยู่ใน ALLOWED_DEVICES
+    const combinedEntities = [...allowedEntities, ...filteredEntities];
+
+    // กรองข้อมูลที่ซ้ำกันโดยใช้ entity_id (หรือ friendly_name ถ้า entity_id ไม่มี)
+    const uniqueEntities = Array.from(
+      new Map(combinedEntities.map((entity) => [entity.entity_id, entity])).values()
+    );
+
+    return uniqueEntities; // ส่งคืนข้อมูลที่ไม่ซ้ำ
   } catch (error) {
     console.error("Error fetching entities:", error);
     throw error;
