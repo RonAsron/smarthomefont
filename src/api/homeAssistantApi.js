@@ -51,21 +51,6 @@ export const toggleDevice = async (entityId, isOn) => {
 };
 
 // เปลี่ยนสีของหลอดไฟ
-<<<<<<< HEAD
-export const setLightColor = async (entityId, rgbColor = null, colorTemp = null) => {
-  try {
-    const data = {};
-    if (rgbColor) {
-      data["rgb_color"] = rgbColor;
-    }
-    if (colorTemp) {
-      data["color_temp"] = colorTemp;
-    }
-    await apiClient.post(`/services/light/turn_on`, {
-      entity_id: entityId,
-      ...data,
-    });
-=======
 export const setLightColor = async (entityId, color = null, colorTemp = null) => {
   try {
     const data = {};
@@ -93,17 +78,11 @@ export const setLightColor = async (entityId, color = null, colorTemp = null) =>
     });
 
     console.log("API response:", response.data); // log ข้อมูลตอบกลับจาก API
->>>>>>> 43799d084af05c09f5c6d00576236466c108105c
   } catch (error) {
     console.error("Error setting light color:", error);
     throw error;
   }
 };
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 43799d084af05c09f5c6d00576236466c108105c
 // ฟังก์ชันดึงข้อมูลจาก Logbook
 export const fetchLogbook = async () => {
   try {
