@@ -2,11 +2,11 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:8123/api";
 const AUTH_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1MzNkY2IyYmFmZTg0ZjRiODc2ZDAyNDMwNjljNDliNiIsImlhdCI6MTczOTA5NjI1MCwiZXhwIjoyMDU0NDU2MjUwfQ.Zlhmf_xVo97UvWwbz8VsNeErgTb33NjswIXzSHCdoTA";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkMzY5Yjk1Y2QyZTY0ZGVlYjU5MmM4ZTVkZWJhNDc1OSIsImlhdCI6MTczOTYwOTU5MSwiZXhwIjoyMDU0OTY5NTkxfQ.M3c3bweIf34suaK3PTJz3qON7RJu6KxYIn4MYIVbw7U";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
+  headers: { 
     Authorization: `Bearer ${AUTH_TOKEN}`,
     "Content-Type": "application/json",
   },
