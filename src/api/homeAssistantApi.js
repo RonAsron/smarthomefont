@@ -13,7 +13,7 @@ const apiClient = axios.create({
 });
 
 const ALLOWED_DEVICES = [
-  "Reception Smart Light",
+  "Downligh",
   "หลอดไฟ Tuya 16 ล้านสี",
   "Door Sensor Door",
   "WiFi smart plug Socket 1",
@@ -21,20 +21,58 @@ const ALLOWED_DEVICES = [
   "Switch 3 Gang Switch 1",
   "Switch 3 Gang Switch 2",
   "Switch 3 Gang Switch 3",
+  "WiFi Breaker Switch 1"
 ];
 
-// ดึงเฉพาะอุปกรณ์ที่ต้องการ
 export const fetchEntities = async () => {
   try {
     const response = await apiClient.get("/states");
-    return response.data.filter(
-      (entity) => ALLOWED_DEVICES.includes(entity.attributes.friendly_name)
+    const data = response.data;
+
+    // กรองอุปกรณ์ที่ไม่ต้องการ
+    const filteredEntities = data.filter((entity) => {
+      // กรองโดยชื่อของ entity
+      const excludeNames = [
+        "asron", "Home Assistant", "บ้าน", "Sun", "Google Translate",
+        "Shopping List", "Door Sensor Tamper", 
+        "WiFi smart plug Power on behavior", "WiFi Breaker Power on behavior", 
+        "WiFi Breaker Indicator light mode", "Door Sensor Battery"
+      ];
+      
+      const excludeStates = ["off"];  // ซ่อนอุปกรณ์ที่สถานะเป็น "ปิด"
+
+      // ตรวจสอบชื่ออุปกรณ์ และสถานะ
+      const isExcludedName = excludeNames.some((name) => 
+        entity.attributes.friendly_name.includes(name)
+      );
+      const isExcludedState = excludeStates.includes(entity.state);
+
+      return !(isExcludedName || isExcludedState);
+    });
+
+    // รวมข้อมูลที่อยู่ใน ALLOWED_DEVICES ตลอดเวลา
+    const allowedEntities = data.filter((entity) =>
+      ALLOWED_DEVICES.some((allowedName) => 
+        entity.attributes.friendly_name.includes(allowedName)
+      )
     );
+
+    // รวมข้อมูลที่กรองแล้วและข้อมูลที่อยู่ใน ALLOWED_DEVICES
+    const combinedEntities = [...allowedEntities, ...filteredEntities];
+
+    // กรองข้อมูลที่ซ้ำกันโดยใช้ entity_id (หรือ friendly_name ถ้า entity_id ไม่มี)
+    const uniqueEntities = Array.from(
+      new Map(combinedEntities.map((entity) => [entity.entity_id, entity])).values()
+    );
+
+    return uniqueEntities; // ส่งคืนข้อมูลที่ไม่ซ้ำ
   } catch (error) {
     console.error("Error fetching entities:", error);
     throw error;
   }
 };
+
+
 
 // เปิด/ปิดอุปกรณ์
 export const toggleDevice = async (entityId, isOn) => {

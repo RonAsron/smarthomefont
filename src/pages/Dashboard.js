@@ -1,9 +1,4 @@
 import React, { useState, useEffect } from "react";
-import {
-  fetchEntities,
-  toggleDevice,
-  setLightColor,
-} from "../api/homeAssistantApi";
 import { Card, Button, Typography, Spin, Row, Col, Modal, Slider } from "antd";
 import {
   BulbOutlined,
@@ -11,6 +6,7 @@ import {
   PoweroffOutlined,
 } from "@ant-design/icons";
 import { Wheel } from "@uiw/react-color";
+import { fetchEntities, toggleDevice, setLightColor, fetchLogbook } from '../api/homeAssistantApi';
 
 const { Title } = Typography;
 
